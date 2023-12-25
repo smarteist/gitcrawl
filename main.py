@@ -50,8 +50,10 @@ if __name__ == "__main__":
                         help='Path to the local git repository or URL of the git repository')
     parser.add_argument('-k', '--keywords', type=str, help='Comma-separated keywords to search for in commit messages')
     parser.add_argument('-e', '--file_extension', type=str, help='File extension to filter changes for')
-    parser.add_argument('-b', '--buggy_dir', type=str, help='Directory to save buggy code diffs')
-    parser.add_argument('-f', '--fixed_dir', type=str, help='Directory to save fixed code diffs')
+    parser.add_argument('-b', '--buggy_dir', type=str, help='Directory to save buggy code diffs',
+                        default=os.path.join(os.path.dirname(__file__), 'bugs'))
+    parser.add_argument('-f', '--fixed_dir', type=str, help='Directory to save fixed code diffs',
+                        default=os.path.join(os.path.dirname(__file__), 'fixes'))
 
     args = parser.parse_args()
     main(args.repo_path, args.keywords, args.file_extension, args.buggy_dir, args.fixed_dir)
