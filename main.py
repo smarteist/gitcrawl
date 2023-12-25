@@ -8,7 +8,7 @@ def save_diff_to_file(diff, filepath):
         file.write(str(diff))
 
 
-def main(repo_path, keywords, file_extension, buggy_dir, fixed_dir):
+def main(repo_path, keywords, file_extensions, buggy_dir, fixed_dir):
     if repo_path.startswith('http://') or repo_path.startswith('https://'):
         repo_dir = repo_path.split('/')[-1]
         if not os.path.exists(repo_dir):
@@ -18,6 +18,7 @@ def main(repo_path, keywords, file_extension, buggy_dir, fixed_dir):
         repo = Repo(repo_path)
 
     keywords = [keyword.lower() for keyword in keywords.split(',')]
+    file_extensions = file_extensions.split(',')
 
     for commit in repo.iter_commits():
         if any(keyword in commit.message.lower() for keyword in keywords):
@@ -26,7 +27,7 @@ def main(repo_path, keywords, file_extension, buggy_dir, fixed_dir):
 
             print('Files changed:')
             for file in stats.files:
-                if file.endswith(file_extension):
+                if any(file.endswith(ext) for ext in file_extensions):
                     print(file)
 
                     diff_index = commit.parents[0].diff(commit)
@@ -49,11 +50,12 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--repo_path', type=str,
                         help='Path to the local git repository or URL of the git repository')
     parser.add_argument('-k', '--keywords', type=str, help='Comma-separated keywords to search for in commit messages')
-    parser.add_argument('-e', '--file_extension', type=str, help='File extension to filter changes for')
+    parser.add_argument('-e', '--file_extensions', type=str,
+                        help='Comma-separated file extensions to filter changes for')
     parser.add_argument('-b', '--buggy_dir', type=str, help='Directory to save buggy code diffs',
                         default=os.path.join(os.path.dirname(__file__), 'bugs'))
     parser.add_argument('-f', '--fixed_dir', type=str, help='Directory to save fixed code diffs',
                         default=os.path.join(os.path.dirname(__file__), 'fixes'))
 
     args = parser.parse_args()
-    main(args.repo_path, args.keywords, args.file_extension, args.buggy_dir, args.fixed_dir)
+    main(args.repo_path, args.keywords, args.file_extensions, args.buggy_dir, args.fixed_dir)
