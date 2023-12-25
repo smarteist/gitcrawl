@@ -36,7 +36,7 @@ def main(repo_path, keyword, file_extension, buggy_dir, fixed_dir):
                             file_base_name = os.path.splitext(os.path.basename(file))[0]
 
                             buggy_path = os.path.join(buggy_dir, f'{file_base_name}_{commit.hexsha}_buggy.diff')
-                            fixed_path = os.path.join(fixed_dir, f'{commit.hexsha}_{file_base_name}_fixed.diff')
+                            fixed_path = os.path.join(fixed_dir, f'{file_base_name}_{commit.hexsha}_fixed.diff')
 
                             save_diff_to_file(diff.a_blob.data_stream.read().decode('utf-8'), buggy_path)
                             save_diff_to_file(diff.b_blob.data_stream.read().decode('utf-8'), fixed_path)
