@@ -25,6 +25,16 @@ def main(repo_path, keywords, file_extensions, buggy_dir, fixed_dir):
             print(f'Commit ID: {commit.hexsha}, Message: {commit.message}')
             stats = commit.stats
 
+            # Create directories for each commit
+            buggy_commit_dir = os.path.join(buggy_dir, commit.hexsha)
+            fixed_commit_dir = os.path.join(fixed_dir, commit.hexsha)
+            os.makedirs(buggy_commit_dir, 0o755, True)
+            os.makedirs(fixed_commit_dir, 0o755, True)
+
+            # Save commit message to a file in the fixed directory
+            with open(os.path.join(fixed_commit_dir, 'commit_message.txt'), 'w') as file:
+                file.write(commit.message)
+
             print('Files changed:')
             for file in stats.files:
                 if any(file.endswith(ext) for ext in file_extensions):
@@ -36,10 +46,11 @@ def main(repo_path, keywords, file_extensions, buggy_dir, fixed_dir):
                             print(f'Differences in {file}:')
                             print(diff)
 
-                            file_base_name = os.path.splitext(os.path.basename(file))[0]
+                            #file_base_name = os.path.splitext(os.path.basename(file))[0]
+                            file_base_name = os.path.basename(file)
 
-                            buggy_path = os.path.join(buggy_dir, f'{file_base_name}_{commit.hexsha}_buggy.diff')
-                            fixed_path = os.path.join(fixed_dir, f'{file_base_name}_{commit.hexsha}_fixed.diff')
+                            buggy_path = os.path.join(buggy_commit_dir, f'{file_base_name}')
+                            fixed_path = os.path.join(fixed_commit_dir, f'{file_base_name}')
 
                             save_diff_to_file(diff.a_blob.data_stream.read().decode('utf-8'), buggy_path)
                             save_diff_to_file(diff.b_blob.data_stream.read().decode('utf-8'), fixed_path)
